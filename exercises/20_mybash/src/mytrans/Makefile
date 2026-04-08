@@ -1,7 +1,9 @@
 # src/mytrans/Makefile
 
 CC = gcc
-CFLAGS = -Wall -I../../include
+AR = ar
+ARFLAGS = rcs
+CFLAGS = -Wall -I../../include -fPIC
 
 # 库名称
 LIBNAME := mytrans
@@ -19,8 +21,14 @@ OBJS := $(patsubst %.o,$(OBJDIR)/%.o,$(OBJS))
 
 all: $(LIB_PATH)
 
-# TODO: 在这里添加你的代码
-# I AM NOT DONE
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o: %.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(LIB_PATH): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 clean:
 	@rm -rf $(OBJDIR)/*.o $(LIB_PATH)
