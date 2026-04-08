@@ -23,8 +23,27 @@ char to_lower(char c) { return tolower(c); }
 
 // 添加单词到哈希表
 void add_word(WordCount **hash_table, const char *word) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  unsigned int index = hash(word);
+  WordCount *node = hash_table[index];
+
+  while (node != NULL) {
+    if (strcmp(node->word, word) == 0) {
+      node->count++;
+      return;
+    }
+    node = node->next;
+  }
+
+  node = malloc(sizeof(WordCount));
+  if (node == NULL) {
+    return;
+  }
+
+  strncpy(node->word, word, MAX_WORD_LEN - 1);
+  node->word[MAX_WORD_LEN - 1] = '\0';
+  node->count = 1;
+  node->next = hash_table[index];
+  hash_table[index] = node;
 }
 
 // 打印单词统计结果
@@ -32,14 +51,27 @@ void print_word_counts(WordCount **hash_table) {
   printf("Word Count Statistics:\n");
   printf("======================\n");
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  for (int i = 0; i < HASH_SIZE; i++) {
+    WordCount *node = hash_table[i];
+    while (node != NULL) {
+      printf("%-20s %d\n", node->word, node->count);
+      node = node->next;
+    }
+  }
 }
 
 // 释放哈希表内存
 void free_hash_table(WordCount **hash_table) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  for (int i = 0; i < HASH_SIZE; i++) {
+    WordCount *node = hash_table[i];
+    while (node != NULL) {
+      WordCount *next = node->next;
+      free(node);
+      node = next;
+    }
+  }
+
+  free(hash_table);
 }
 
 // 处理文件并统计单词

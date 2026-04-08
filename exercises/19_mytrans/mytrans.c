@@ -7,8 +7,22 @@
 #include <string.h>
 
 void trim(char *str) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    char *start = str;
+    char *end;
+
+    while (isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    if (start != str) {
+        memmove(str, start, strlen(start) + 1);
+    }
+
+    end = str + strlen(str);
+    while (end > str && isspace((unsigned char)*(end - 1))) {
+        end--;
+    }
+    *end = '\0';
 }
 
 int load_dictionary(const char *filename, HashTable *table,
@@ -22,10 +36,28 @@ int load_dictionary(const char *filename, HashTable *table,
   char line[1024];
   char current_word[100] = {0};
   char current_translation[1024] = {0};
-  int in_entry = 0;
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  while (fgets(line, sizeof(line), file) != NULL) {
+    trim(line);
+    if (line[0] == '\0') {
+      continue;
+    }
+
+    if (line[0] == '#') {
+      strncpy(current_word, line + 1, sizeof(current_word) - 1);
+      current_word[sizeof(current_word) - 1] = '\0';
+      continue;
+    }
+
+    if (strncmp(line, "Trans:", 6) == 0 && current_word[0] != '\0') {
+      strncpy(current_translation, line + 6, sizeof(current_translation) - 1);
+      current_translation[sizeof(current_translation) - 1] = '\0';
+      hash_table_insert(table, current_word, current_translation);
+      (*dict_count)++;
+      current_word[0] = '\0';
+      current_translation[0] = '\0';
+    }
+  }
 
   fclose(file);
   return 0;

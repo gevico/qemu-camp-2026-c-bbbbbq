@@ -42,10 +42,25 @@ int main() {
     }
 
     // 使用 strtok 按空格分割单词
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    char *token = strtok(line, " \t,.;:!?()[]{}\"-");
+    while (token != NULL) {
+      char normalized[256];
+      strncpy(normalized, token, sizeof(normalized) - 1);
+      normalized[sizeof(normalized) - 1] = '\0';
+      to_lowercase(normalized);
+
+      const char *translation = hash_table_lookup(table, normalized);
+      if (translation != NULL) {
+        printf("原文: %s\t翻译: %s\n", normalized, translation);
+      } else {
+        printf("原文: %s\t未找到该单词的翻译。\n", normalized);
+      }
+
+      token = strtok(NULL, " \t,.;:!?()[]{}\"-");
+    }
   }
 
+  fclose(file);
   free_hash_table(table);
   return 0;
 }

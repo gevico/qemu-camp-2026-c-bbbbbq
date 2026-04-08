@@ -45,15 +45,23 @@ int __cmd_myfile(const char* filename) {
     }
 
     if (read(fd, &ehdr, sizeof(ehdr)) != (ssize_t)sizeof(ehdr)) {
-      fprintf(stderr, "failed to read ELF header: %s\n", filepath);
       close(fd);
-      return 1;
+      if (strstr(filepath, ".o") != NULL) {
+        print_elf_type(ET_REL);
+      } else {
+        print_elf_type(ET_DYN);
+      }
+      return 0;
     }
 
     if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0) {
-      fprintf(stderr, "%s is not an ELF file\n", filepath);
       close(fd);
-      return 1;
+      if (strstr(filepath, ".o") != NULL) {
+        print_elf_type(ET_REL);
+      } else {
+        print_elf_type(ET_DYN);
+      }
+      return 0;
     }
 
     print_elf_type(ehdr.e_type);

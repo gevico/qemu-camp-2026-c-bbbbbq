@@ -26,6 +26,29 @@ static inline link next_wrap(link p) {
     return p->next ? p->next : get_head_node();
 }
 
+static link prev_wrap(link current) {
+    link head = get_head_node();
+    link prev;
+
+    if (head == NULL || current == NULL) {
+        return NULL;
+    }
+
+    if (head == current) {
+        prev = head;
+        while (prev->next != NULL) {
+            prev = prev->next;
+        }
+        return prev;
+    }
+
+    prev = head;
+    while (prev->next != NULL && prev->next != current) {
+        prev = prev->next;
+    }
+    return prev;
+}
+
 // 创建单链表
 void create_list(int n) {
     // 参数校验
@@ -63,19 +86,18 @@ void josephus_problem(int n, int k, int m) {
 
     // 依次出列并打印顺序
     for (int out = 0; out < n; ++out) {
-        if (m == 1) {
-            // m==1 时当前节点直接出列
-            // TODO: 在这里添加你的代码
-            // I AM NOT DONE
+        link prev = prev_wrap(current);
+
+        for (int step = 1; step < m; ++step) {
+            prev = current;
+            current = next_wrap(current);
         }
 
-        // 数到 m 的那个人出列：从 current 开始走 m-1 步，落在第 m 个节点
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
-
-        // 此时 current 指向要出列的人
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        link next = next_wrap(current);
+        print_item(current);
+        delete(current);
+        free_node(current);
+        current = (out == n - 1) ? NULL : next;
     }
 
     printf("\n");
