@@ -14,6 +14,25 @@
  
  // 开始时间
  static clock_t start_time;
+
+ static void read_command_output(FILE* fp, char* output, size_t output_size) {
+     size_t used = 0;
+     int ch;
+
+     if (output_size == 0) {
+         while ((ch = fgetc(fp)) != EOF) {
+         }
+         return;
+     }
+
+     while ((ch = fgetc(fp)) != EOF) {
+         if (used + 1 < output_size) {
+             output[used++] = (char)ch;
+         }
+     }
+
+     output[used] = '\0';
+ }
  
  /**
   * 初始化测试框架
@@ -80,7 +99,7 @@
     switch (is_make) {
         case 1:
         case 2: {
-            snprintf(compile_cmd, sizeof(compile_cmd), "cd ../exercises/%s && make 2>&1", executable);
+            snprintf(compile_cmd, sizeof(compile_cmd), "cd ../exercises/%s && make clean >/dev/null 2>&1 && make 2>&1", executable);
             fp = popen(compile_cmd, "r");
             if (fp == NULL) {
                 strncpy(output, "无法执行编译命令", output_size - 1);
@@ -109,8 +128,8 @@
     }
     
      
-     char compile_output[4096] = {0};
-     size_t bytes_read = fread(compile_output, 1, sizeof(compile_output) - 1, fp);
+     char compile_output[16384] = {0};
+     read_command_output(fp, compile_output, sizeof(compile_output));
      int compile_status = pclose(fp);
      
      // 检查编译是否成功
@@ -144,8 +163,7 @@
      
      
      // 读取程序输出
-     bytes_read = fread(output, 1, output_size - 1, fp);
-     output[bytes_read] = '\0';
+     read_command_output(fp, output, output_size);
      
      int run_status = pclose(fp);
      return run_status;
