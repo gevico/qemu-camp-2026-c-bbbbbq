@@ -46,10 +46,16 @@ test: check-all
 clean:
 	@rm -f $(CHECKER)
 	@rm -f $(CHECKER_DIR)/*.o
-	@find $(EXERCISES_DIR) -type f -executable -delete 2>/dev/null || true
+	@for dir in $(EXERCISES_DIR)/*; do \
+		[ -d "$$dir" ] || continue; \
+		base=$$(basename "$$dir"); \
+		rm -f "$$dir/$$base"; \
+	done
+	@find $(EXERCISES_DIR) -type f -path '*/bin/*' -delete 2>/dev/null || true
 	@find $(EXERCISES_DIR) -type f -name '*.o' -delete 2>/dev/null || true
 	@find $(EXERCISES_DIR) -type f -name '*.d' -delete 2>/dev/null || true
-	@find $(TESTS_DIR) -type f -executable -name "test_*" -delete 2>/dev/null || true
+	@find $(EXERCISES_DIR) -type f -name '*.a' -delete 2>/dev/null || true
+	@find $(TESTS_DIR) -type f -name "test_*" ! -name "*.c" -delete 2>/dev/null || true
 	@rm -f test_results_summary.json 2>/dev/null || true
 	@echo "✅ 清理完成"
 
